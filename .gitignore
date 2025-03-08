@@ -1,0 +1,24 @@
+# Ignore virtual enviroment
+env/
+.env
+
+# Ignore StaticFiles
+staticfiles/
+/staticfiles
+
+
+# Ignorar archivos de Python compilados
+__pycache__/
+*.py[cod]
+
+# Ignorar archivos de configuración de editor y sistema
+.vscode/
+.DS_Store
+
+dist/
+.dist
+/dist
+
+node_modules/
+.node_modules
+/node_modules
