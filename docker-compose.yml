@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+
+  db:
+    image: postgres:17
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME_DEV}
+      POSTGRES_USER: ${DB_USER_DEV}
+      POSTGRES_PASSWORD: ${DB_PASSWORD_DEV}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gaver
+    depends_on:
+      - db
+    command: >
+      bash -c "
+      until PGPASSWORD=${DB_PASSWORD_DEV} pg_isready -h db -p 5432 -U ${DB_USER_DEV}; do
+        echo 'Waiting for the database to be ready...';
+        sleep 1;
+      done;
+      echo 'Database is ready!';
+      python manage.py migrate &&
+      python manage.py collectstatic --noinput &&
+      python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    environment:
+      - DJANGO_SETTINGS_MODULE=gaver.settings.dev
+    ports:
+      - "8000:8000"
+
+volumes:
+  postgres_data:
