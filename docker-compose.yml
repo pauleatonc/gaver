@@ -7,9 +7,9 @@ services:
     container_name: postgres
     restart: always
     environment:
-      POSTGRES_DB: ${DB_NAME_DEV}
-      POSTGRES_USER: ${DB_USER_DEV}
-      POSTGRES_PASSWORD: ${DB_PASSWORD_DEV}
+      POSTGRES_DB: gaverdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
     env_file:
@@ -42,6 +42,24 @@ services:
       - DJANGO_SETTINGS_MODULE=gaver.settings.dev
     ports:
       - "8000:8000"
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: gaver-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../frontend:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - NODE_ENV=development
+      - VITE_HOST=0.0.0.0
+      - VITE_PORT=3000
+    depends_on:
+      - backend
 
 volumes:
   postgres_data:
